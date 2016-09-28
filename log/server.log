@@ -1,0 +1,6 @@
+[2016-09-28 01:41:32,319]                  log -     INFO:      MainThread-       <module>() - Closing server
+[2016-09-28 01:41:32,319]                  log -     INFO:      MainThread-       <module>() - Server closed
+[2016-09-28 01:52:10,946]            ServerLog -     INFO:      MainThread-       <module>() - Closing server
+[2016-09-28 01:52:10,947]            ServerLog -     INFO:      MainThread-       <module>() - Server closed
+[2016-09-28 01:54:09,285]            ServerLog -     INFO:      MainThread-       <module>() - Closing server
+[2016-09-28 01:54:09,286]            ServerLog -     INFO:      MainThread-       <module>() - Server closed
