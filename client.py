@@ -23,22 +23,26 @@ class Client(threading.Thread):
         self.server_host = server_host
         self.logger = logging.getLogger('ClientLog')
         
+    def send_messages(self):
+        while True:
+            start = timer()
+            msg = 'Hello World'.encode()
+            self.logger.debug("[Enviando: %s]",
+                              msg)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind((self.ip, self.port))
+            sock.sendto(msg, self.server_host)
+            self.logger.debug("[Enviado]")
+            self.logger.debug("[Recibiendo respuesta...]")
+            data = sock.recv(1024)
+            end = timer()
+            self.logger.info("[Recibido: %s] -> DIFF=%s",
+                             data, end - start)
+            time.sleep(1)
+    
     def run(self):
         try:
-            while True:
-                start = timer()
-                msg = 'Hello World'.encode()
-                self.logger.debug("[Enviando: %s]",
-                                 msg)
-                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sock.sendto(msg, self.server_host)
-                self.logger.debug("[Enviado]")
-                self.logger.debug("[Recibiendo respuesta...]")
-                data = sock.recv(1024)
-                end = timer()
-                self.logger.info("[Recibido: %s] -> DIFF=%s",
-                                 data, end - start)
-                time.sleep(1)
+            self.send_messages()
         except KeyboardInterrupt:
             self.logger.debug("You hit <Ctrl-C>, exiting...")
             self.logger.info("Client closed")

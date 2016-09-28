@@ -11,14 +11,15 @@ import time
 from log import server_logger
 
 
-class UDPHandler(socketserver.BaseRequestHandler):
-    def __init__(self, request, client_address, server):
+class UDPHandler(threading.Thread, socketserver.BaseRequestHandler):
+    def __init__(self, request, client_address, server, action_time=1):
         self.logger = logging.getLogger('ServerLog')
         self.socket = request[1]
         self.data = request[0]
         self.turnstile = None
         self.card = None
         self.id_tag = ""
+        self.action_time = action_time
         socketserver.BaseRequestHandler.__init__(self,
                                                  request,
                                                  client_address,
@@ -28,15 +29,21 @@ class UDPHandler(socketserver.BaseRequestHandler):
     def setup(self):
         return socketserver.BaseRequestHandler.setup(self)
 
-    def handle(self):
+    def send_reply(self):
         start = timer()
+        self.logger.debug("[Respondiendo: %s to %s]",
+                          self.data, self.client_address)
+        time.sleep(self.action_time)
         self.socket.sendto(
             self.data, self.client_address)
-        time.sleep(1)
         end = timer()
-        self.logger.debug("[Procesando: %s] -> DIFF=%s",
-                          self.data, end - start)
+        self.logger.debug("[Respondido] -> DIFF=%s", end - start)
         return
+    
+    def handle(self):
+        
+        t = threading.Thread(target=self.send_reply)
+        t.start()
 
     def finish(self):
         return socketserver.BaseRequestHandler.finish(self)
@@ -56,9 +63,6 @@ class Server(socketserver.ThreadingMixIn, socketserver.UDPServer):
         return
     
     def serve_forever(self):
-        # logger.debug(" ".join([config_name.upper(),
-        # app.config.get("SQLALCHEMY_DATABASE_URI")]))
-
         self.logger.debug("Starting server, hit <Ctrl-C> to quit")
         self.logger.debug("Logging is working")
         while True:
@@ -87,12 +91,19 @@ class Server(socketserver.ThreadingMixIn, socketserver.UDPServer):
         return socketserver.UDPServer.close_request(self, request_address)
 
 
+class ServerMagic(socketserver.ThreadingMixIn, socketserver.UDPServer):
+    pass
+
 if __name__ == '__main__':
+    #server = ServerMagic((0.0.0.0', 5050))
     server = Server(ip='0.0.0.0', port=5050)
     try:
-        server.serve_forever()
+        
+        th = threading.Thread(target=server.serve_forever())
+        th.daemon = True
+        th.start()
     except KeyboardInterrupt:
-        logger.debug("You hit <Ctrl-C>, exiting...")
-        logger.info("Closing server")
+        server_logger.debug("You hit <Ctrl-C>, exiting...")
+        server_logger.info("Closing server")
         server.server_close()
-        logger.info("Server closed")
+        server_logger.info("Server closed")

@@ -61,7 +61,7 @@ LOGFILE = os.path.join(
 fh = logging.handlers.RotatingFileHandler(filename=LOGFILE,
                                           maxBytes=10e6,
                                           backupCount=10)
-fh.setLevel(logging.INFO)
+fh.setLevel(logging.DEBUG)
 fh.setFormatter(formatter)
 client_logger.addHandler(fh)
 
