@@ -28,16 +28,16 @@ LOGFILE = os.path.join(
 fh = logging.handlers.RotatingFileHandler(filename=LOGFILE,
                                           maxBytes=10e6,
                                           backupCount=10)
-fh.setLevel(logging.INFO)
+fh.setLevel(logging.DEBUG)
 fh.setFormatter(formatter)
 server_logger.addHandler(fh)
 
 # Console Handler
 # if sys.stdin.isatty():
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-ch.setFormatter(formatter)
-server_logger.addHandler(ch)
+# ch = logging.StreamHandler()
+# ch.setLevel(logging.DEBUG)
+# ch.setFormatter(formatter)
+# server_logger.addHandler(ch)
 
 
 # SETTING CLIENT LOG
@@ -67,7 +67,7 @@ client_logger.addHandler(fh)
 
 # Console Handler
 # if sys.stdin.isatty():
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-ch.setFormatter(formatter)
-client_logger.addHandler(ch)
+# ch = logging.StreamHandler()
+# ch.setLevel(logging.INFO)
+# ch.setFormatter(formatter)
+# client_logger.addHandler(ch)

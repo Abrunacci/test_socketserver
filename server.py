@@ -37,17 +37,19 @@ class UDPHandler(threading.Thread, socketserver.BaseRequestHandler):
         self.socket.sendto(
             self.data, self.client_address)
         end = timer()
-        self.logger.debug("[Respondido] -> DIFF=%s", end - start)
+        self.logger.debug("[Respondido a %s] -> DIFF=%s",
+                          self.client_address,
+                          end - start)
         return
-    
+
     def handle(self):
-        
-        t = threading.Thread(target=self.send_reply)
-        t.start()
+        self.send_reply()
+        #t = threading.Thread(target=self.send_reply)
+        #t.start()
 
     def finish(self):
         return socketserver.BaseRequestHandler.finish(self)
-    
+
 
 class Server(socketserver.ThreadingMixIn, socketserver.UDPServer):
     def __init__(self, ip='', port='', timeout=2, handler_class=UDPHandler):
@@ -57,36 +59,36 @@ class Server(socketserver.ThreadingMixIn, socketserver.UDPServer):
         self.timeout = timeout
         server_address = (ip, port)
         socketserver.UDPServer.__init__(self, server_address, handler_class)
-    
+
     def server_activate(self):
         socketserver.UDPServer.server_activate(self)
         return
-    
+
     def serve_forever(self):
         self.logger.debug("Starting server, hit <Ctrl-C> to quit")
         self.logger.debug("Logging is working")
         while True:
             self.handle_request()
         return
-    
+
     def handle_request(self):
         return socketserver.UDPServer.handle_request(self)
-    
+
     def verify_request(self, request, client_address):
         return socketserver.UDPServer.verify_request(self, request,
                                                      client_address)
-    
+
     def process_request(self, request, client_address):
         return socketserver.UDPServer.process_request(self, request,
                                                       client_address)
-    
+
     def server_close(self):
         return socketserver.UDPServer.server_close(self)
-    
+
     def finish_request(self, request, client_address):
         return socketserver.UDPServer.finish_request(self, request,
                                                      client_address)
-    
+
     def close_request(self, request_address):
         return socketserver.UDPServer.close_request(self, request_address)
 
@@ -95,10 +97,10 @@ class ServerMagic(socketserver.ThreadingMixIn, socketserver.UDPServer):
     pass
 
 if __name__ == '__main__':
-    #server = ServerMagic((0.0.0.0', 5050))
-    server = Server(ip='0.0.0.0', port=5050)
+    server = ServerMagic(('0.0.0.0', 5050), UDPHandler)
+    #server = Server(ip='0.0.0.0', port=5050)
     try:
-        
+
         th = threading.Thread(target=server.serve_forever())
         th.daemon = True
         th.start()
